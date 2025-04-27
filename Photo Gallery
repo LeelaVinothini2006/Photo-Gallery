@@ -911,7 +911,7 @@
             cursor: pointer;
             text-decoration: none;
         }
-        .star {
+        .falling-star {
             position: absolute;
             top: -10px;
             font-size: 2rem;
@@ -934,69 +934,73 @@
         .stars span {
             font-size: 2rem;
             cursor: pointer;
-            color: #FFD700;
+            color: #ccc;
             transition: color 0.3s ease;
         }
-        .stars span:hover {
-            color: #ffcc00;
-        }
-        .star {
-            color: #ccc;
+        .stars span:hover,
+        .stars span.active {
+            color: #FFD700;
         }
         .rating-box {
             margin-top: 10px;
             font-size: 1.2rem;
             color: #FFD700;
         }
-
     </style>
 </head>
 <body>
     <a class="back-btn" href="javascript:history.back()">Back</a>
     <img id="fullImg" src="" alt="Full Image View">
+    
     <div class="btn-container">
         <a class="btn" id="downloadBtn" href="" download>Download</a>
         <a class="btn" href="javascript:void(0)" onclick="saveImage()">Save Image</a>
     </div>
+
     <div class="rating-container">
         <div>Rate this image:</div>
         <div class="stars" id="stars">
-            <span class="star" onclick="rateImage(1)">&#9733;</span>
-            <span class="star" onclick="rateImage(2)">&#9733;</span>
-            <span class="star" onclick="rateImage(3)">&#9733;</span>
-            <span class="star" onclick="rateImage(4)">&#9733;</span>
-            <span class="star" onclick="rateImage(5)">&#9733;</span>
+            <span onclick="rateImage(1)">&#9733;</span>
+            <span onclick="rateImage(2)">&#9733;</span>
+            <span onclick="rateImage(3)">&#9733;</span>
+            <span onclick="rateImage(4)">&#9733;</span>
+            <span onclick="rateImage(5)">&#9733;</span>
         </div>
         <div id="ratingValue" class="rating-box">Rating: 0</div>
     </div>
+
     <script>
         const params = new URLSearchParams(window.location.search);
         const imgSrc = params.get("src");
         const fullImg = document.getElementById("fullImg");
         const downloadBtn = document.getElementById("downloadBtn");
+
         if (imgSrc) {
             fullImg.src = imgSrc;
             downloadBtn.href = imgSrc;
         }
+
         let currentRating = 0;
         const ratingValue = document.getElementById('ratingValue');
-        const stars = document.getElementById('stars');
+        const stars = document.getElementById('stars').getElementsByTagName('span');
+
         function rateImage(rating) {
             currentRating = rating;
             ratingValue.textContent = `Rating: ${currentRating}`;
             updateStars();
             triggerFallingStars();
         }
+
         function updateStars() {
-            const allStars = stars.getElementsByClassName('star');
-            for (let i = 0; i < allStars.length; i++) {
+            for (let i = 0; i < stars.length; i++) {
                 if (i < currentRating) {
-                    allStars[i].style.color = '#FFD700'; 
+                    stars[i].classList.add('active');
                 } else {
-                    allStars[i].style.color = '#ccc'; 
+                    stars[i].classList.remove('active');
                 }
             }
         }
+
         function saveImage() {
             const imageURL = fullImg.src;
             localStorage.setItem('savedImage', imageURL);
@@ -1007,16 +1011,18 @@
             a.click();
             triggerFallingStars();
         }
+
         function triggerFallingStars() {
             const numStars = 20;
             for (let i = 0; i < numStars; i++) {
                 createFallingStar();
             }
         }
+
         function createFallingStar() {
             const star = document.createElement('div');
-            star.classList.add('star');
-            star.innerHTML = '&#9733;'; 
+            star.classList.add('falling-star'); 
+            star.innerHTML = '&#9733;';
             star.style.left = `${Math.random() * 100}vw`;
             document.body.appendChild(star);
             setTimeout(() => {
